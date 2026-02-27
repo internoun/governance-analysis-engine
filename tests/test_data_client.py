@@ -115,3 +115,18 @@ def test_timeout_is_passed_to_httpx(
     client.fetch_data("endpoint")
 
     assert captured_timeout["value"] == 5.0
+
+
+def test_external_api_error_preserves_original_message(
+    monkeypatch: pytest.MonkeyPatch,
+    client: DataClient,
+) -> None:
+    def mock_get(*args: Any, **kwargs: Any) -> MockResponse:
+        raise httpx.HTTPError("boom")
+
+    monkeypatch.setattr(httpx, "get", mock_get)
+
+    with pytest.raises(ExternalAPIError) as exc:
+        client.fetch_data("endpoint")
+
+    assert "boom" in str(exc.value)
