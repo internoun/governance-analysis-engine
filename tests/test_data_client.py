@@ -3,10 +3,8 @@ from typing import Any
 import httpx
 import pytest
 
-from governance_analysis_engine.clients.data_client import (
-    DataClient,
-    ExternalAPIError,
-)
+from governance_analysis_engine.clients.data_client import DataClient
+from governance_analysis_engine.exceptions import ExternalAPIError
 
 BASE_URL = "https://example.com"
 
