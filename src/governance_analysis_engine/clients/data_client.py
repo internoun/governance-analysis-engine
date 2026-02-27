@@ -1,9 +1,6 @@
 from typing import Any, cast
 import httpx
-
-
-class ExternalAPIError(Exception):
-    """Raised when external API request fails."""
+from governance_analysis_engine.exceptions import ExternalAPIError
 
 
 class DataClient:
