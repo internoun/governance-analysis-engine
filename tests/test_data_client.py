@@ -81,3 +81,52 @@ def test_empty_endpoint_raises_value_error(
 ) -> None:
     with pytest.raises(ValueError):
         client.fetch_data("")
+
+
+def test_base_url_and_endpoint_are_normalized(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    called_url: dict[str, str] = {}
+
+    def mock_get(url: str, *args: Any, **kwargs: Any) -> MockResponse:
+        called_url["value"] = url
+        return MockResponse(json_data={"ok": True})
+
+    monkeypatch.setattr(httpx, "get", mock_get)
+
+    client = DataClient("https://example.com/")
+    client.fetch_data("/endpoint")
+
+    assert called_url["value"] == "https://example.com/endpoint"
+
+
+def test_timeout_is_passed_to_httpx(
+    monkeypatch: pytest.MonkeyPatch,
+    client: DataClient,
+) -> None:
+    captured_timeout: dict[str, float | None] = {}
+
+    def mock_get(url: str, *args: Any, **kwargs: Any) -> MockResponse:
+        captured_timeout["value"] = kwargs.get("timeout")
+        return MockResponse(json_data={"ok": True})
+
+    monkeypatch.setattr(httpx, "get", mock_get)
+
+    client.fetch_data("endpoint")
+
+    assert captured_timeout["value"] == 5.0
+
+
+def test_external_api_error_preserves_original_message(
+    monkeypatch: pytest.MonkeyPatch,
+    client: DataClient,
+) -> None:
+    def mock_get(*args: Any, **kwargs: Any) -> MockResponse:
+        raise httpx.HTTPError("boom")
+
+    monkeypatch.setattr(httpx, "get", mock_get)
+
+    with pytest.raises(ExternalAPIError) as exc:
+        client.fetch_data("endpoint")
+
+    assert "boom" in str(exc.value)

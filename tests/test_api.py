@@ -28,3 +28,16 @@ def test_invalid_route_returns_404() -> None:
     response = client.get("/non-existent-route")
 
     assert response.status_code == 404
+
+
+def test_openapi_schema_contains_info_endpoint() -> None:
+    response = client.get("/openapi.json")
+
+    assert response.status_code == 200
+    assert "/info" in response.json()["paths"]
+
+
+def test_health_response_structure() -> None:
+    response = client.get("/health")
+
+    assert isinstance(response.json()["status"], str)
