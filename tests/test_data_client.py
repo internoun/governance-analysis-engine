@@ -81,3 +81,20 @@ def test_empty_endpoint_raises_value_error(
 ) -> None:
     with pytest.raises(ValueError):
         client.fetch_data("")
+
+
+def test_base_url_and_endpoint_are_normalized(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    called_url: dict[str, str] = {}
+
+    def mock_get(url: str, *args: Any, **kwargs: Any) -> MockResponse:
+        called_url["value"] = url
+        return MockResponse(json_data={"ok": True})
+
+    monkeypatch.setattr(httpx, "get", mock_get)
+
+    client = DataClient("https://example.com/")
+    client.fetch_data("/endpoint")
+
+    assert called_url["value"] == "https://example.com/endpoint"
