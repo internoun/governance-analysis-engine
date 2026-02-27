@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 import httpx
 
 
@@ -25,6 +25,8 @@ class DataClient:
             raise ExternalAPIError(str(exc)) from exc
 
         try:
-            return response.json()
+            data = response.json()
         except ValueError as exc:
             raise ExternalAPIError("Invalid JSON response") from exc
+
+        return cast(dict[str, Any], data)
