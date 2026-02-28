@@ -5,6 +5,9 @@ from governance_analysis_engine.services.proposal_service import (
     Proposal,
     summarize_proposal,
 )
+from governance_analysis_engine.config import configure_logging
+
+configure_logging()
 
 app = FastAPI()
 
