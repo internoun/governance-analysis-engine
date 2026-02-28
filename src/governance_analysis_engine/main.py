@@ -6,10 +6,14 @@ from governance_analysis_engine.services.proposal_service import (
     summarize_proposal,
 )
 from governance_analysis_engine.config import configure_logging
+from governance_analysis_engine.middleware.error_handler import (
+    error_handling_middleware,
+)
 
 configure_logging()
 
 app = FastAPI()
+app.middleware("http")(error_handling_middleware)
 
 
 class HealthResponse(BaseModel):
