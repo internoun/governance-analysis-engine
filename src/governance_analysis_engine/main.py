@@ -1,16 +1,16 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from governance_analysis_engine.config import configure_logging, settings
+from governance_analysis_engine.middleware.error_handler import (
+    error_handling_middleware,
+)
 from governance_analysis_engine.services.proposal_service import (
     Proposal,
     summarize_proposal,
 )
-from governance_analysis_engine.config import configure_logging
-from governance_analysis_engine.middleware.error_handler import (
-    error_handling_middleware,
-)
 
-configure_logging()
+configure_logging(settings.log_level)
 
 app = FastAPI()
 app.middleware("http")(error_handling_middleware)
@@ -31,7 +31,7 @@ def health_check() -> HealthResponse:
 
 @app.get("/info", response_model=MessageResponse)
 def get_info() -> MessageResponse:
-    return MessageResponse(message="governance-analysis-engine running")
+    return MessageResponse(message=f"{settings.app_name} running")
 
 
 @app.post("/proposal/summarize")
