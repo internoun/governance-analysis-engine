@@ -1,6 +1,5 @@
 """Custom exceptions for the governance analysis engine."""
 
-
 __all__ = ["ExternalAPIError"]
 
 

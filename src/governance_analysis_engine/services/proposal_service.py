@@ -37,7 +37,9 @@ class ProposalSummary:
     summary: str
 
 
-def summarize_proposal(proposal: Proposal, max_length: int = DEFAULT_SUMMARY_LENGTH) -> ProposalSummary:
+def summarize_proposal(
+    proposal: Proposal, max_length: int = DEFAULT_SUMMARY_LENGTH
+) -> ProposalSummary:
     """Generate a deterministic summary of a proposal.
 
     The current implementation truncates the proposal body to the specified
