@@ -7,10 +7,11 @@ from governance_analysis_engine.config import configure_logging, settings
 from governance_analysis_engine.middleware.error_handler import (
     error_handling_middleware,
 )
+from governance_analysis_engine.repositories import InMemoryProposalRepository
 from governance_analysis_engine.schemas import SummarizeRequest, SummarizeResponse
 from governance_analysis_engine.services.proposal_service import (
     Proposal,
-    summarize_proposal,
+    ProposalService,
 )
 
 
@@ -30,6 +31,10 @@ configure_logging(settings.log_level)
 
 app: FastAPI = FastAPI()
 app.middleware("http")(error_handling_middleware)
+
+# Instantiate repository and service
+_repository = InMemoryProposalRepository()
+_proposal_service = ProposalService(_repository)
 
 
 class HealthResponse(BaseModel):
@@ -74,13 +79,17 @@ def summarize(request: SummarizeRequest) -> SummarizeResponse:
     Returns:
         A summary of the proposal.
     """
-    proposal: Proposal = Proposal(
+    proposal = Proposal(
         proposal_id=request.proposal_id,
         title=request.title,
         body=request.body,
     )
 
-    result = summarize_proposal(proposal)
+    # Store proposal for retrieval
+    _proposal_service.add_proposal(proposal)
+
+    # Generate summary using the service
+    result = _proposal_service.summarize(proposal.proposal_id)
 
     return SummarizeResponse(
         proposal_id=result.proposal_id,
