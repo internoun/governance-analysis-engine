@@ -20,6 +20,7 @@ src/governance_analysis_engine/
 ├── exceptions.py          # Custom exceptions
 ├── clients/               # External API clients
 ├── middleware/            # Error handling
+├── repositories/          # Data access layer
 └── services/              # Business logic
 ```
 
@@ -39,10 +40,20 @@ GET /health
 
 ```
 POST /proposal/summarize
+Content-Type: application/json
+
+{
+  "proposal_id": "proposal-123",
+  "title": "Example Proposal",
+  "body": "Full proposal text to summarize..."
+}
 ```
 
 ```json
-{ "message": "Summarized proposal text..." }
+{
+  "proposal_id": "proposal-123",
+  "summary": "Truncated proposal text..."
+}
 ```
 
 ## Development
