@@ -7,13 +7,23 @@ from governance_analysis_engine.config import configure_logging, settings
 from governance_analysis_engine.middleware.error_handler import (
     error_handling_middleware,
 )
+from governance_analysis_engine.schemas import SummarizeRequest, SummarizeResponse
 from governance_analysis_engine.services.proposal_service import (
     Proposal,
     summarize_proposal,
 )
 
 
-__all__ = ["app", "HealthResponse", "MessageResponse", "health_check", "get_info", "summarize"]
+__all__ = [
+    "app",
+    "HealthResponse",
+    "MessageResponse",
+    "SummarizeRequest",
+    "SummarizeResponse",
+    "health_check",
+    "get_info",
+    "summarize",
+]
 
 
 configure_logging(settings.log_level)
@@ -54,22 +64,25 @@ def get_info() -> MessageResponse:
     return MessageResponse(message=f"{settings.app_name} running")
 
 
-@app.post("/proposal/summarize")
-def summarize(input_data: MessageResponse) -> MessageResponse:
+@app.post("/proposal/summarize", response_model=SummarizeResponse)
+def summarize(request: SummarizeRequest) -> SummarizeResponse:
     """Summarize a governance proposal.
 
     Args:
-        input_data: The proposal text to summarize.
+        request: The proposal data to summarize.
 
     Returns:
         A summary of the proposal.
     """
     proposal: Proposal = Proposal(
-        proposal_id="static-id",
-        title="",
-        body=input_data.message,
+        proposal_id=request.proposal_id,
+        title=request.title,
+        body=request.body,
     )
 
     result = summarize_proposal(proposal)
 
-    return MessageResponse(message=result.summary)
+    return SummarizeResponse(
+        proposal_id=result.proposal_id,
+        summary=result.summary,
+    )
