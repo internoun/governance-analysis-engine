@@ -1,9 +1,10 @@
 """Service for processing governance proposals."""
 
 from dataclasses import dataclass
+from typing import Protocol
 
 
-__all__ = ["Proposal", "ProposalSummary", "summarize_proposal"]
+__all__ = ["Proposal", "ProposalSummary", "summarize_proposal", "ProposalService"]
 
 
 DEFAULT_SUMMARY_LENGTH: int = 120
@@ -37,6 +38,13 @@ class ProposalSummary:
     summary: str
 
 
+class ProposalRepository(Protocol):
+    """Repository abstraction for proposal data access."""
+
+    def get(self, proposal_id: str) -> Proposal | None: ...
+    def add(self, proposal: Proposal) -> None: ...
+
+
 def summarize_proposal(
     proposal: Proposal, max_length: int = DEFAULT_SUMMARY_LENGTH
 ) -> ProposalSummary:
@@ -59,3 +67,43 @@ def summarize_proposal(
         proposal_id=proposal.proposal_id,
         summary=summary,
     )
+
+
+class ProposalService:
+    """Service for managing and summarizing proposals."""
+
+    def __init__(self, repository: ProposalRepository) -> None:
+        """Initialize the service with a repository.
+
+        Args:
+            repository: The repository for proposal data access.
+        """
+        self._repository = repository
+
+    def summarize(
+        self, proposal_id: str, max_length: int = DEFAULT_SUMMARY_LENGTH
+    ) -> ProposalSummary:
+        """Summarize a proposal by ID.
+
+        Args:
+            proposal_id: Unique identifier for the proposal.
+            max_length: Maximum length of the summary in characters.
+
+        Returns:
+            A ProposalSummary containing the summarized proposal.
+
+        Raises:
+            ValueError: If the proposal is not found.
+        """
+        proposal = self._repository.get(proposal_id)
+        if proposal is None:
+            raise ValueError("Proposal not found")
+        return summarize_proposal(proposal, max_length)
+
+    def add_proposal(self, proposal: Proposal) -> None:
+        """Add a proposal to the repository.
+
+        Args:
+            proposal: The proposal to add.
+        """
+        self._repository.add(proposal)
