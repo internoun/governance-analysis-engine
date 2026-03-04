@@ -96,6 +96,7 @@ class TestCLI:
     def test_cli_as_module_subprocess(self) -> None:
         """Test CLI invocation via python -m module pattern."""
         import os
+
         repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         src_path = os.path.join(repo_root, "src")
 
