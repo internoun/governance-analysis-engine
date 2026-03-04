@@ -60,6 +60,10 @@ Content-Type: application/json
 
 See [docs/development.md](docs/development.md) for setup instructions.
 
+## Roadmap
+
+See [docs/roadmap.md](docs/roadmap.md) for project milestones and future plans.
+
 ## License
 
 [MIT License](LICENSE)
