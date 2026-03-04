@@ -59,3 +59,28 @@ def test_service_raises_value_error_when_proposal_missing() -> None:
 
     with pytest.raises(ValueError, match="Proposal not found"):
         service.summarize("non-existent-id")
+
+
+def test_repository_add_duplicate_overwrites() -> None:
+    """Test that adding a proposal with duplicate ID overwrites the existing one."""
+    repository = InMemoryProposalRepository()
+
+    proposal1 = Proposal(
+        proposal_id="duplicate-id",
+        title="Original Title",
+        body="Original body",
+    )
+    proposal2 = Proposal(
+        proposal_id="duplicate-id",
+        title="Updated Title",
+        body="Updated body",
+    )
+
+    repository.add(proposal1)
+    repository.add(proposal2)
+
+    result = repository.get("duplicate-id")
+
+    assert result is not None
+    assert result.title == "Updated Title"
+    assert result.body == "Updated body"
