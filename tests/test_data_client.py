@@ -130,3 +130,18 @@ def test_external_api_error_preserves_original_message(
         client.fetch_data("endpoint")
 
     assert "boom" in str(exc.value)
+
+
+def test_fetch_data_timeout_error(
+    monkeypatch: pytest.MonkeyPatch,
+    client: DataClient,
+) -> None:
+    """Test that timeout errors are properly wrapped in ExternalAPIError."""
+
+    def mock_get(*args: Any, **kwargs: Any) -> MockResponse:
+        raise httpx.TimeoutException("Request timed out", request=None)
+
+    monkeypatch.setattr(httpx, "get", mock_get)
+
+    with pytest.raises(ExternalAPIError):
+        client.fetch_data("endpoint")
