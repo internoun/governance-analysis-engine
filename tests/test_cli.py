@@ -95,9 +95,13 @@ class TestCLI:
 
     def test_cli_as_module_subprocess(self) -> None:
         """Test CLI invocation via python -m module pattern."""
+        import os
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        src_path = os.path.join(repo_root, "src")
+
         result = subprocess.run(
             [sys.executable, "-m", "governance_analysis_engine", "subprocess test"],
-            cwd="/Users/rayaan/Internoun/governance-analysis-engine/src",
+            cwd=src_path,
             capture_output=True,
             text=True,
         )
