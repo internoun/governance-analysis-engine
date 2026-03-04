@@ -238,3 +238,34 @@ def test_openapi_schema_contains_summarize_endpoint() -> None:
 
     assert response.status_code == 200
     assert "/proposal/summarize" in response.json()["paths"]
+
+
+def test_summarize_endpoint_422_invalid_body_type() -> None:
+    """Test that non-string body type returns 422."""
+    response = client.post(
+        "/proposal/summarize",
+        json={
+            "proposal_id": "test-123",
+            "title": "Test Proposal",
+            "body": 12345,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_summarize_endpoint_handles_very_long_message() -> None:
+    """Test that very long body is handled correctly."""
+    very_long_body = "x" * 10000
+    response = client.post(
+        "/proposal/summarize",
+        json={
+            "proposal_id": "test-123",
+            "title": "Test Proposal",
+            "body": very_long_body,
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["summary"]) == 120
