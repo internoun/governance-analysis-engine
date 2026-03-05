@@ -1,4 +1,4 @@
-# governance-analysis-engine
+# Governance Analysis Engine
 
 Analysis engine for Web3 governance data.
 
